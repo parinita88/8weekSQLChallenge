@@ -55,19 +55,21 @@ SELECT
 FROM
     tmp_runner_orders
 WHERE
-    cancellation IS NULL
+    cancellation = ''
 GROUP BY runner_id;
 
 /* How many of each type of pizza was delivered? */
 SELECT 
-    pizza_id, COUNT(*) AS 'No of Pizza Delivered'
+    pizza_name, COUNT(*) AS 'No of Pizza Delivered'
 FROM
     tmp_runner_orders
         LEFT JOIN
     tmp_customer_orders ON tmp_runner_orders.order_id = tmp_customer_orders.order_id
+        LEFT JOIN
+    pizza_names ON tmp_customer_orders.pizza_id = pizza_names.pizza_id
 WHERE
-    cancellation = 'NA'
-GROUP BY pizza_id;
+    cancellation = ''
+GROUP BY pizza_name;
 
 /* How many Vegetarian and Meatlovers were ordered by each customer? */
 SELECT 
@@ -88,10 +90,14 @@ GROUP BY customer_id;
 
 /* What was the maximum number of pizzas delivered in a single order? */
 SELECT 
-    COUNT(pizza_id) as 'Max No of Pizza in a Order'
+    COUNT(pizza_id) AS 'Max No of Pizza in a Order'
 FROM
     tmp_customer_orders
-GROUP BY order_id
+        LEFT JOIN
+    tmp_runner_orders ON tmp_customer_orders.order_id = tmp_runner_orders.order_id
+WHERE
+    cancellation = ''
+GROUP BY tmp_customer_orders.order_id
 ORDER BY COUNT(pizza_id) DESC
 LIMIT 1;
 
@@ -103,12 +109,15 @@ SELECT
         ELSE 0
     END) AS 'No change',
     SUM(CASE
-        WHEN exclusions != '' AND extras = '' THEN 1
-        WHEN exclusions = '' AND extras != '' THEN 1
+        WHEN exclusions != '' OR extras != '' THEN 1
         ELSE 0
     END) AS 'One change'
 FROM
     tmp_customer_orders
+        LEFT JOIN
+    tmp_runner_orders ON tmp_customer_orders.order_id = tmp_runner_orders.order_id
+WHERE
+    cancellation = ''
 GROUP BY customer_id;
 
 /* How many pizzas were delivered that had both exclusions and extras? */
@@ -116,8 +125,12 @@ SELECT
     COUNT(*) AS 'Pizza with both exclusions and extras'
 FROM
     tmp_customer_orders
+        LEFT JOIN
+    tmp_runner_orders ON tmp_customer_orders.order_id = tmp_runner_orders.order_id
 WHERE
-    exclusions != '' AND extras != '';
-    
+    exclusions != '' AND extras != ''
+        AND cancellation = '';
+
+
 
 
