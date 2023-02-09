@@ -12,7 +12,7 @@ ORDER BY 2 DESC;
 /* Question 2 - How many days has each customer visited the restaurant? */
 SELECT 
     customer_id,
-    COUNT(DISTINCT order_date) AS 'No od Days Visited'
+    COUNT(DISTINCT order_date) AS 'No of Days Visited'
 FROM
     sales
 GROUP BY customer_id
@@ -169,7 +169,7 @@ FROM
         LEFT JOIN
     menu ON sales.product_id = menu.product_id
         LEFT JOIN
-    members ON members.customer_id = sales.customer_id
+    members ON members.customer_id = sales.customer_id;
     
 /* Bonus Question 2 */
 WITH summary_rank_cte AS 
